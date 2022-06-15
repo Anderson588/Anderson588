@@ -1,0 +1,31 @@
+import openpyxl
+
+filename = 'filename.xlsx'
+
+wb = openpyxl.load_workbook(filename)
+
+newb = openpyxl.Workbook()
+newb.remove(newb.active)
+
+for sh_name in wb.sheetnames:
+	sheet = wb[sh_name]
+	highest_row = sheet.max_row
+
+	newsheet = newb.create_sheet(title=sh_name)
+
+	header = list(sheet.columns)[0]
+	newcolumns = [cellObj.value.strip().rstrip(':') for cellObj in header]
+
+	row_i = 1
+
+	for col_i in range(0, highest_row):
+		newsheet.cell(row=row_i, column=col_i + 1).value = newcolumns[col_i]
+
+	elements = list(sheet.columns)[1:]
+	for element in elements:
+		row_i = row_i + 1
+		for col_i in range(0, highest_row):
+			newsheet.cell(row=row_i, column=col_i + 1).value = element[col_i].value
+
+
+newb.save('changed_' + filename)
