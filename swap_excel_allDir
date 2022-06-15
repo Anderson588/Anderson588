@@ -1,0 +1,36 @@
+import glob openpyxl
+
+myPath = "."
+files = list()
+files = glob.glob(myPath + '/**/*.xls', recursive=True) + glob.glob(myPath + '/**/*.xlsx', recursive=True) 
+outFile = open("swapXY_excel.rpt", "w")
+for file in files:
+    mess = "Executing xy transpose : [ " + file + " ] --> [ " + "swapXY_" + file + " ] ...\n"
+    outFile.write(mess)
+    file_xy(file)
+outFile.close()
+
+def file_xy(fileName)
+    wb = openpyxl.load_workbook(fileName)
+
+    newb = openpyxl.Workbook()
+    newb.remove(newb.active)
+
+    for sh_name in wb.sheetnames:
+	sheet = wb[sh_name]
+	newsheet = newb.create_sheet(title=sh_name)
+
+	header = list(sheet.columns)[0]
+	newcolumns = [cellObj.value.strip().rstrip(':') for cellObj in header]
+	row_i = 1
+	highest_row = sheet.max_row
+
+	for col_i in range(0, highest_row):
+		newsheet.cell(row=row_i, column=col_i + 1).value = newcolumns[col_i]
+	elements = list(sheet.columns)[1:]
+	for element in elements:
+		row_i = row_i + 1
+		for col_i in range(0, highest_row):
+			newsheet.cell(row=row_i, column=col_i + 1).value = element[col_i].value
+
+    newb.save('swapXY_' + fileName)
